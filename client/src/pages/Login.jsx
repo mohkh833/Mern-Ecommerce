@@ -3,6 +3,8 @@ import {mobile} from "../responsive";
 import { useState } from "react";
 import { login } from "../redux/apiCalls";
 import { useDispatch, useSelector  } from "react-redux";
+import { Navigate } from "react-router-dom";
+import {Link} from "react-router-dom"
 const Container = styled.div`
   width: 100vw;
   height: 100vh;
@@ -56,7 +58,7 @@ const Button = styled.button`
   }
 `;
 
-const Link = styled.a`
+const LinkTag = styled.a`
   margin: 5px 0px;
   font-size: 12px;
   text-decoration: underline;
@@ -67,16 +69,24 @@ const Error = styled.span`
   color: red;
 `;
 
-const Login = () => {
+const Login = (props) => {
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [err, setErr] = useState("")
   const dispatch = useDispatch();
-const {isFetching, error} = useSelector((state)=> state.user)
+  const {isFetching, error, isLoggedIn, messageCode} = useSelector((state)=> state.user)
 
   const handleClick = (e) => {
-    e.preventDefault();
+    e.preventDefault()
     login(dispatch, { username, password });
+    
+    if(messageCode === 404 || messageCode === 401 ){
+        setErr("Wrong username or password")
+    }
   };
+
+
   return (
     <Container>
       <Wrapper>
@@ -91,12 +101,21 @@ const {isFetching, error} = useSelector((state)=> state.user)
             type="password"
             onChange={(e) => setPassword(e.target.value)}
           />
-          <Button onClick={handleClick} disabled={isFetching}>
+          <Button onClick={handleClick} >
             LOGIN
           </Button>
-          {error && <Error>Something went wrong...</Error>}
-          <Link>DO NOT YOU REMEMBER THE PASSWORD?</Link>
-          <Link>CREATE A NEW ACCOUNT</Link>
+          {isLoggedIn && <Navigate to="/"/>}
+          
+          {err.length!==0 && <Error>{err}</Error>}
+          
+          <Link to="/">
+          <LinkTag>DO NOT YOU REMEMBER THE PASSWORD?</LinkTag>
+          </Link>
+
+          <Link to='/register'>
+          <LinkTag >CREATE A NEW ACCOUNT</LinkTag>
+          </Link>
+          
         </Form>
       </Wrapper>
     </Container>
