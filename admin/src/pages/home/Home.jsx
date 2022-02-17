@@ -40,7 +40,9 @@ export default function Home() {
           ]);
         });
         setLoading(false);
-      } catch {}
+      } catch (err) {
+        console.log(err)
+      }
     };
     getStats();
   }, [MONTHS]);

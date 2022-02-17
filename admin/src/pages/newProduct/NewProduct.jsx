@@ -14,6 +14,8 @@ export default function NewProduct() {
   const [inputs, setInputs] = useState({});
   const [file, setFile] = useState(null);
   const [cat, setCat] = useState([]);
+  const [size, setSize] = useState([]);
+  const [color, setColor] = useState([])
   const dispatch = useDispatch();
 
   const handleChange = (e) => {
@@ -21,9 +23,18 @@ export default function NewProduct() {
       return { ...prev, [e.target.name]: e.target.value };
     });
   };
+  
   const handleCat = (e) => {
     setCat(e.target.value.split(","));
   };
+
+  const handleSize = (e) => {
+    setSize(e.target.value.split(","))
+  }
+
+  const handleColor = (e) => {
+    setColor(e.target.value.split(","))
+  }
 
   const handleClick = (e) => {
     e.preventDefault();
@@ -51,14 +62,14 @@ export default function NewProduct() {
         (error) => {},
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            const product = { ...inputs, img: downloadURL, categories: cat };
+            const product = { ...inputs, img: downloadURL, categories: cat, size: size, color: color };
             addProduct(product, dispatch);
           });
         }
       );
     }
-    const product = { ...inputs, categories: cat };
-    addProduct(product, dispatch);
+      // const product = { ...inputs, categories: cat };
+      // addProduct(product, dispatch);
   };
 
   return (
@@ -70,6 +81,7 @@ export default function NewProduct() {
           <input
             type="file"
             id="file"
+            required
             onChange={(e) => setFile(e.target.files[0])}
           />
         </div>
@@ -104,6 +116,17 @@ export default function NewProduct() {
           <label>Categories</label>
           <input type="text" placeholder="jeans,skirts" onChange={handleCat} />
         </div>
+        <div className="addProductItem">
+        <label>Sizes</label>
+        <input type="text" placeholder="S,M,L" onChange={handleSize} />
+        </div>
+
+        <div className="addProductItem">
+        <label>Colors</label>
+        <input type="text" placeholder="white,green,yellow" onChange={handleColor} />
+        </div>
+
+
         <div className="addProductItem">
           <label>Stock</label>
           <select name="inStock" onChange={handleChange}>

@@ -24,12 +24,22 @@ export default function Product() {
   const [inputs, setInputs] = useState({});
   const [cat, setCat] = useState([]);
   const [file, setFile] = useState(null);
+  const [size, setSize] = useState([]);
+  const [color, setColor] = useState([])
   const dispatch = useDispatch();
 
   const product = useSelector((state) =>
     state.product.products.find((product) => product._id === productId)
   );
 
+
+  const handleSize = (e) => {
+    setSize(e.target.value.split(","))
+  }
+
+  const handleColor = (e) => {
+    setColor(e.target.value.split(","))
+  }
   const MONTHS = useMemo(
     () => [
       "Jan",
@@ -90,14 +100,16 @@ export default function Product() {
           // Handle successful uploads on complete
           // For instance, get the download URL: https://firebasestorage.googleapis.com/...
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            const product = { ...inputs, img: downloadURL, categories: cat };
+            const product = { ...inputs, img: downloadURL, categories: cat, size: size, color: color };
             updateProduct(productId, product, dispatch);
           });
         }
       );
+    } else{
+      const product = { ...inputs, categories: cat, size: size, color: color };
+      updateProduct(productId, product, dispatch);
     }
-    const product = { ...inputs, categories: cat };
-    updateProduct(productId, product, dispatch);
+
   };
 
   useEffect(() => {
@@ -119,6 +131,7 @@ export default function Product() {
     };
     getStats();
   }, [productId, MONTHS]);
+  
 
   if (product) {
     return (
@@ -179,14 +192,26 @@ export default function Product() {
                 onChange={handleUpdate}
               />
 
-              <div className="addProductItem">
                 <label>Categories</label>
                 <input
                   type="text"
                   placeholder="jeans,skirts"
                   onChange={handleCat}
                 />
-              </div>
+
+                <label>Sizes</label>
+                <input
+                  type="text"
+                  placeholder="S,M,L"
+                  onChange={handleSize}
+                />
+
+                <label>Colors</label>
+                <input
+                  type="text"
+                  placeholder="white,blue,yellow"
+                  onChange={handleColor}
+                />
               <label>In Stock</label>
               <select name="inStock" id="idStock" onChange={handleUpdate}>
                 <option value="true">Yes</option>

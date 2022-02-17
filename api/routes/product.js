@@ -13,6 +13,5 @@ router.get("/find/:id",  productController.getProductById)
 
 router.get("/", productController.getAllProducts)
 
-router.get("/stats", verifyTokenAndAdmin, productController.getStats);
 
 module.exports = router
