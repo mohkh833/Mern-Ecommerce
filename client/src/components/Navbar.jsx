@@ -9,11 +9,13 @@ import {logOut} from "../redux/userRedux"
 import { useDispatch } from "react-redux";
 import { useState } from "react";
 const Container = styled.div`
+  position: relative;
   height: 60px;
   ${mobile({ height: "50px" })}
 `;
 
 const Wrapper = styled.div`
+
   padding: 10px 20px;
   display: flex;
   align-items: center;
@@ -22,6 +24,7 @@ const Wrapper = styled.div`
 `;
 
 const Left = styled.div`
+
   flex: 1;
   display: flex;
   align-items: center;
@@ -74,18 +77,64 @@ const NameItem = styled.div`
   font-size: 14px;
   font-weight:bold;
   cursor: pointer;
-  margin-left: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;  
   ${mobile({ fontSize: "12px", marginLeft: "10px" })}
+  margin-top:5px;
 `;
+
+const ListContainer = styled.div`
+  position: relative;
+  top: 100%;
+  right: 0;
+  z-index: 2;
+  &:hover {
+    background-color: #e9f5f5;
+    transition: all 0.5s ease;
+  }
+`;
+
+const List = styled.ul`
+  list-style: none;
+  padding: 0;
+  background-color:#EAF6FF;
+  position: absolute;
+  width: 200px;
+  z-index: 1;
+`;
+
+const ListItem = styled.li`
+  padding: 8px 12px;
+  
+`;
+
+const UserContainer = styled.div`
+  position: relative;
+  cursor: pointer;
+  margin-right: 10px;
+  color: #555;
+  width: 100px;
+  height: 20px;
+  margin-left:0px;
+
+`;
+
 
 const Navbar = () => {
   const dispatch = useDispatch()
-  let user = useSelector((state) => state.user.currentUser)
   let isLoggedIn = useSelector((state) => state.user.isLoggedIn)
+  let username = useSelector((state) => state.user.username)
   const quantity = useSelector(state=> state.cart.quantity)
+  
+  const [open, setOpen] = useState(false)
 
   const handleLogOut =() => {
     dispatch(logOut())
+  }
+
+  const handleClick = () => {
+    setOpen(!open)
   }
   return (
     <Container>
@@ -101,10 +150,32 @@ const Navbar = () => {
           <Logo>Shop.</Logo>
         </Center>
         <Right>
-        {!isLoggedIn && <Link to="/register"><MenuItem>REGISTER</MenuItem></Link> }
-        {!isLoggedIn && <Link to="/login"><MenuItem>SIGN IN</MenuItem></Link>}
-        {isLoggedIn && <NameItem>{user.username}</NameItem> } 
-        {isLoggedIn && <MenuItem onClick={handleLogOut}>Log Out</MenuItem> } 
+
+        {!isLoggedIn && (
+          <>
+          <Link to="/register"><MenuItem>REGISTER</MenuItem></Link>
+          <Link to="/login"><MenuItem>SIGN IN</MenuItem></Link>
+          </> 
+        )}
+        {isLoggedIn && (
+          <>
+          <ListContainer>
+          <UserContainer onClick={handleClick}>
+          <NameItem >{username}</NameItem>
+          </UserContainer>
+          {open &&
+          <List className="dropdown">
+          <Link to="/profile">
+            <ListItem>
+              show Profile
+            </ListItem>
+          </Link> 
+          </List>
+          }
+          </ListContainer>
+          <MenuItem onClick={handleLogOut}>Log Out</MenuItem>
+          </>
+        )}
           <Link to="/cart"> 
           <MenuItem>
             <Badge badgeContent={quantity} color="primary">

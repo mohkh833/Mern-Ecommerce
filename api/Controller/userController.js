@@ -1,32 +1,50 @@
 const User = require("../models/User");
 const CryptoJS = require("crypto-js");
+const fs = require("fs")
 
 exports.updateUser = async (req, res) => {
-    if (req.body.password) {
-        req.body.password = CryptoJS.AES.encrypt(
-        req.body.password,
-        process.env.PASS_SEC
-        ).toString();
+    let {username, email, password} = req.body
+    let img
+    if(req.file){
+        img =req.file.path
     }
     try {
         if (req.body.password) {
+
+            password = CryptoJS.AES.encrypt(
+                req.body.password,
+                process.env.PASS_SEC
+                ).toString();
+
             const updatedUser = await User.findByIdAndUpdate(
             req.params.id,
             {
-                $set: req.body,
+                $set: {
+                    ...username && {username},
+                    ...email && {email},
+                    ...password && {password},
+                    img :img,
+                } 
             },
             { new: true }
         );
         }
-        const updatedUser = await User.findByIdAndUpdate(
+        await User.findByIdAndUpdate(
             req.params.id,
         {
-            $set: { username: req.body.username, email: req.body.email },
-            },
-            { new: true }
+            $set: {
+                ...username && {username},
+                ...email && {email},
+                img : img,
+            } 
+            }
         );
+        const updatedUser = await User.findById(req.params.id)
+        
+        console.log(updatedUser)
         res.status(200).json(updatedUser);
     } catch (err) {
+        console.log(err)
         res.status(500).json(err);
     }
 }
@@ -85,4 +103,16 @@ exports.getUserStats = async(req, res) => {
     } catch (err) {
         res.status(500).json(err);
     }
+}
+
+exports.uploadImage= async(req, res) => {
+    
+    console.log(req.file)
+    const updatedUser = await User.findByIdAndUpdate(
+        req.params.id,
+    {
+        $set: {img: req.file.path} ,
+        },
+        { new: true }
+    )
 }
